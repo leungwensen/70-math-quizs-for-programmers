@@ -26,7 +26,7 @@ ISBN |
 出版日期 | 
 译者 | [绝云](http://blog.leungwensen.com/)
 出版社 | [北京图灵文化发展有限公司](http://www.ituring.com.cn/)
-版式 | A5 x 312页
+版式 | 
 
 
 ## 源码
