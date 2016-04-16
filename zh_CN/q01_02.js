@@ -1,9 +1,9 @@
-/* 文字列型に逆順を返すメソッドを追加 */
+/* 为字符串类型添加返回逆序字符串的方法 */
 String.prototype.reverse = function (){
   return this.split("").reverse().join("");
 }
 
-/* 11から探索開始 */
+/* 从11开始检索 */
 var num = 11;
 while (true){
   if ((num.toString() == num.toString().reverse()) &&
@@ -12,6 +12,6 @@ while (true){
     console.log(num);
     break;
   }
-  /* 奇数だけを探すため、2つずつ増やす */
+  /* 只检索奇数，每次加2 */
   num += 2;
 }

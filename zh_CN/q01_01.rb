@@ -1,4 +1,4 @@
-# 11から探索開始
+# 从11开始检索
 num = 11
 while true
   if num.to_s == num.to_s.reverse &&
@@ -7,6 +7,6 @@ while true
     puts num
     break
   end
-  # 奇数だけを探すため、2つずつ増やす
+  # 只检索奇数，每次加2
   num += 2
 end
