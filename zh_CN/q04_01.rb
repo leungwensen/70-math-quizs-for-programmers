@@ -1,10 +1,10 @@
-def cutbar(m, n, current) # currentは現在の棒の数
+def cutbar(m, n, current) # current是目前木棒的数目
   if current >= n then
-    0 # 切り終えた
+    0 # 完成切分
   elsif current < m then
-    1 + cutbar(m, n, current * 2) # 次は現在の2倍になる
+    1 + cutbar(m, n, current * 2) # 接下来是现在数目的2倍
   else
-    1 + cutbar(m, n, current + m) # はさみの数だけ追加
+    1 + cutbar(m, n, current + m) # 加上剪刀的数目
   end
 end
 

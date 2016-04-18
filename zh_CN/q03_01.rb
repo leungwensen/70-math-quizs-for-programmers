@@ -1,8 +1,8 @@
-# カードの初期化
+# 初始化卡牌
 N = 100
 cards = Array.new(N, false)
 
-# 2〜Nまで裏返す
+# 从2到N翻牌
 (2..N).each{|i|
   j = i - 1
   while (j < cards.size) do
@@ -11,7 +11,7 @@ cards = Array.new(N, false)
   end
 }
 
-# 裏向きのカードを出力
+# 输出背面朝上的牌
 N.times{|i|
   puts i + 1 if !cards[i]
 }
