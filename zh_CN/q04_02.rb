@@ -1,6 +1,6 @@
 def cutbar(m, n)
   count = 0
-  current = 1 # currentは現在の長さ
+  current = 1 # current是当前长度
   while n > current do
     current += current < m ? current : m
     count = count + 1

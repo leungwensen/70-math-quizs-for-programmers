@@ -4,7 +4,7 @@ def cutbar(m, n, current) # current是目前木棒的数目
   elsif current < m then
     1 + cutbar(m, n, current * 2) # 接下来是现在数目的2倍
   else
-    1 + cutbar(m, n, current + m) # 加上剪刀的数目
+    1 + cutbar(m, n, current + m) # 加上刀的数目
   end
 end
 
