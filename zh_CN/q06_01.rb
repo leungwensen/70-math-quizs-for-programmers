@@ -1,8 +1,8 @@
-# ループしているかチェック
+# 检测是否形成环
 def is_loop(n)
-  # 最初は3をかけて1を足す
+  # 最开始乘以3加1
   check = n * 3 + 1
-  # 1になるまで数字を変化させることを繰り返す
+  # 一直循环到数字变为1
   while check != 1 do
     check = check.even? ? check / 2 : check * 3 + 1
     return true if check == n
@@ -10,7 +10,7 @@ def is_loop(n)
   return false
 end
 
-# 2〜10000まで、偶数についてチェックする
+# 检查2～10000之间的所有偶数
 puts 2.step(10000, 2).count{|i|
   is_loop(i)
 }
