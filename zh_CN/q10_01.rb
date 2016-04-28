@@ -10,10 +10,10 @@ def sum_max(roulette, n)
   roulette.size.times{|i|
     tmp = 0
     if i + n <= roulette.size then
-      # 配列の両端をまたがない場合
+      # 不包含数组两端元素的情况
       tmp = roulette[i, n].inject(:+)
     else
-      # 配列の両端をまたぐ場合
+      # 包含数组两端元素的情况
       tmp = roulette[0, (i + n) % roulette.size].inject(:+)
       tmp += roulette[i..-1].inject(:+)
     end
