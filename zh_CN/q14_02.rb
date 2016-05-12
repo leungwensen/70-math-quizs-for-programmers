@@ -1,4 +1,4 @@
-# ワールドカップ出場国を配列にセット
+# 设置一个保持世界杯参赛国的数组
 country = ["Brazil", "Croatia", "Mexico", "Cameroon",
            "Spain", "Netherlands", "Chile", "Australia",
            "Colombia", "Greece", "Cote d'Ivoire", "Japan",
@@ -9,23 +9,23 @@ country = ["Brazil", "Croatia", "Mexico", "Cameroon",
            "USA", "Belgium", "Algeria", "Russia",
            "Korea Republic"]
 def search(countrys, prev, depth)
-  # 前の国名に続く国の一覧を取得
+  # 取得所有后续可能的国名
   next_country = countrys.select{|c| c[0] == prev[-1].upcase}
   if next_country.size > 0 then
-    # 続く国がある場合、その国を除いて再帰的に探索
+    # 如果有可用的国名，则加入队列，并除去这个国名继续递归搜索
     next_country.each{|c|
       search(countrys - [c], c, depth + 1)
     }
   else
-    # 続く国がない場合、深さが最大かどうかチェック
+    # 如果没有可用国名，则判断当前深度是否最大
     @max_depth = [@max_depth, depth].max
   end
 end
 
-# すべての国から開始
+# 从各个国家开始
 @max_depth = 0
 country.each{|c|
   search(country - [c], c, 1)
 }
-# 深さの最大値（しりとりで続く国の数）を表示
+# 输出最大深度（即连续的国名数目）
 puts @max_depth
