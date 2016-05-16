@@ -1,20 +1,20 @@
-N = 10      # 階段の段数
-STEPS = 4   # 一気に進める段数
+N = 10      # 楼梯级数
+STEPS = 4   # 一次最大前进级数
 
 @memo = {}
 
 def move(a, b)
   return @memo[[a,b]] if @memo.has_key?([a, b])
-  return @memo[[a,b]] = 0 if a > b   # AさんがBよりも上になれば終了
-  return @memo[[a, b]] = 1 if a == b # 同じ段に止まればカウント
+  return @memo[[a,b]] = 0 if a > b   # 如果A级数比B大，则结束搜索
+  return @memo[[a, b]] = 1 if a == b # 如果停在同一级，则算入结果
   cnt = 0
   (1..STEPS).each{|da|
     (1..STEPS).each{|db|
-      cnt += move(a + da, b - db) # 再帰的に探索
+      cnt += move(a + da, b - db) # 递归搜索
     }
   }
   @memo[[a, b]] = cnt
 end
 
-# Aさんは0の位置から、BさんはNの位置からスタート
+# A从0位置开始，B从N位置开始
 puts move(0, N)
