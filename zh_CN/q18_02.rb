@@ -1,11 +1,11 @@
 def check(last_n, used, list)
-  # すべて使用済みで、先頭の「1」と平方数になると終了
+  # 已经全部使用，如果和最初的“1”相加能得到平方数，则结束递归
   return [1] if used.all? && (list[1].include?(last_n))
-  list[last_n].each{|i|           # 候補を順に試す
-    if used[i - 1] == false then  # 使用済みでない場合
+  list[last_n].each{|i|           # 逐一尝试候补数字
+    if used[i - 1] == false then  # 没有全部使用的情况
       used[i - 1] = true
       result = check(i, used, list)
-      # 見つけた場合は、その値を追加して返す
+      # 找到的时候，添加这个值
       return [i] + result if result.size > 0
       used[i - 1] = false
     end
@@ -16,12 +16,12 @@ end
 n = 2
 while true do
   square = (2..Math.sqrt(n * 2).floor).map{|i| i ** 2}
-  # 隣り合う可能性がある候補を作成
+  # 找到可以作为相邻数字的候补数字
   list = {}
   (1..n).each{|i|
     list[i] = square.map{|s| s - i}.select{|s| s > 0}
   }
-  # 「1」を使用済みにして、「1」から探索開始
+  # 把“1”设置为已使用，从“1”开始搜索
   result = check(1, [true] + [false] * (n - 1), list)
   break if result.size > 0
   n += 1
