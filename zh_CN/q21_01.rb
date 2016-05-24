@@ -1,18 +1,18 @@
-count = 0     # 「0」が出現した回数
-line = 1      # 現在の行数
-row = [1]     # 現在の行の値
+count = 0     # “0”出现的次数
+line = 1      # 当前行的行数
+row = [1]     # 当前行的值
 
 while count < 2014 do
   next_row = [1]
-  # 前行から排他的論理和で次の行をセット
+  # 通过上一行计算异或得到下一行
   (row.size - 1).times{|i|
     cell = row[i] ^ row[i + 1]
     next_row.push(cell)
-    count += 1 if cell == 0  # 「0」の場合にカウント
+    count += 1 if cell == 0  # 统计“0”出现的次数
   }
   next_row.push(1)
-  line += 1                  # 行数を増やして次の行へ
+  line += 1                  # 增加行数，进入下一行处理
   row = next_row
 end
 
-puts line        # 2014個カウントした行を出力
+puts line        # 统计到2014个“0”时的行
