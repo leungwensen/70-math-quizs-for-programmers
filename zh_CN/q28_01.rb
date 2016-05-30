@@ -3,10 +3,10 @@ club = [[11000, 40], [8000, 30], [400, 24], [800, 20], [900, 14],
 N = 150
 
 max = 0
-# 選択するクラブの数を順に試す
+# 按顺序选择社团
 1.upto(club.size){|i|
   club.combination(i){|ary|
-    # 選択したクラブで部員数の和が条件を満たすとき
+    # 已选择社团人数满足条件时
     if ary.map{|i| i[1]}.inject(:+) <= N then
       max = [ary.map{|i| i[0]}.inject(:+), max].max
     end
