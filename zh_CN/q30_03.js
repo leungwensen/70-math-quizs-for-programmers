@@ -7,14 +7,14 @@ function set_tap(remain){
     return memo[remain];
   }
   var cnt = 0;
-  /* 2口 */
+  /* 2插口 */
   for (var i = 1; i <= remain / 2; i++){
     if (remain - i == i)
       cnt += set_tap(i) * (set_tap(i) + 1) / 2;
     else
       cnt += set_tap(remain - i) * set_tap(i);
   }
-  /* 3口 */
+  /* 3插口 */
   for (var i = 1; i <= remain / 3; i++){
     for (var j = i; j <= (remain - i) / 2; j++){
       if ((remain - (i + j) == i) && (i == j))

@@ -4,7 +4,7 @@ N = 20
 def set_tap(remain)
   return @memo[remain] if @memo.has_key?(remain)
   cnt = 0
-  # 2口
+  # 2插口
   (1..(remain / 2)).each{|i|
     if remain - i == i then
       cnt += set_tap(i) * (set_tap(i) + 1) / 2
@@ -12,7 +12,7 @@ def set_tap(remain)
       cnt += set_tap(remain - i) * set_tap(i)
     end
   }
-  # 3口
+  # 3插口
   (1..(remain / 3)).each{|i|
     (i..((remain - i) / 2)).each{|j|
       if (remain - (i + j) == i) && (i == j) then
