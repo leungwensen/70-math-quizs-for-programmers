@@ -1,11 +1,11 @@
-# 次の目を取得する
+# 获取下一个数字序列
 def next_dice(dice)
   top = dice.div(6**5)
   left, right = dice.divmod(6**(5 - top))
   (right + 1) * (6**(top + 1)) - (left + 1)
 end
 
-# 探索した値を記録する(0:未探索、1:ループ以外、2:ループ)
+# 记录已检索的值（0:未检索，1:循环外，2:循环内）
 all_dice = Array.new(6 ** 6, 0)
 (6**6).times{|i|
   if all_dice[i] == 0 then
@@ -15,10 +15,10 @@ all_dice = Array.new(6 ** 6, 0)
       i = next_dice(i)
     end
     index = check.index(i)
-    if (index) then # ループしたとき、その位置以前はループ以外
+    if (index) then # 循环发生点，这个位置前是循环外
       check.shift(index).each{|j| all_dice[j] = 1}
       check.each{|j| all_dice[j] = 2}
-    else # すでにチェック済みの値に当たった時はループ以外
+    else # 包含已检索值时为循环外
       check.each{|j| all_dice[j] = 1}
     end
   end
