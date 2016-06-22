@@ -1,19 +1,19 @@
 require "prime"
 
-# 3桁の素数を取得
+# 获取3位的质数
 primes = Prime.each(1000).select{|i| i >= 100}
 
-# 先頭の桁でハッシュを作成
+# 以首位数字生成哈希表
 prime_h = {0 => []}
 primes.chunk{|i| i / 100}.each{|k, v|
   prime_h[k] = v
 }
 
 cnt = 0
-primes.each{|r1|                     # 1行目
-  prime_h[r1 / 100].each{|c1|        # 1列目
-    prime_h[r1 % 100 / 10].each{|c2| # 2列目
-      prime_h[r1 % 10].each{|c3|     # 3列目
+primes.each{|r1|                     # 第1行
+  prime_h[r1 / 100].each{|c1|        # 第1列
+    prime_h[r1 % 100 / 10].each{|c2| # 第2列
+      prime_h[r1 % 10].each{|c3|     # 第3列
         r2 = (c1 % 100 / 10) * 100 + (c2 % 100 / 10) * 10 +
              (c3 % 100 / 10)
         r3 = (c1 % 10) * 100 + (c2 % 10) * 10 + (c3 % 10)
