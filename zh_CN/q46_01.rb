@@ -1,11 +1,11 @@
 N = 7
-checked = {(1..N).to_a => 0} # チェック済みの配列
-check = [(1..N).to_a]        # チェック対象
-depth = 0                    # 交換回数
+checked = {(1..N).to_a => 0} # 已检查的数组
+check = [(1..N).to_a]        # 检查目标
+depth = 0                    # 交换次数
 
-while check.size > 0 do      # チェック対象が存在する間、繰り返す
+while check.size > 0 do      # 如果存在检查目标，则循环
   next_check = []
-  (0..(N-1)).to_a.combination(2){|i, j|  # 2カ所選択して交換
+  (0..(N-1)).to_a.combination(2){|i, j|  # 选择两个数字交换
     check.each{|c|
       d = c.clone
       d[i], d[j] = d[j], d[i]
