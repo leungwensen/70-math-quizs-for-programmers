@@ -13,7 +13,7 @@ function cut_cake(w, h, diff){
     return Infinity;
   }
 
-  /* 縦と横に切ってみる */
+  /* 横向纵向切分 */
   var result = new Array();
   for (var i = 1; i <= parseInt(w / 2); i++){
     result.push(h + cut_cake(w - i, h, i * h - diff));
@@ -21,7 +21,7 @@ function cut_cake(w, h, diff){
   for (var i = 1; i <= parseInt(h / 2); i++){
     result.push(w + cut_cake(w, h - i, w * i - diff));
   }
-  /* 縦と横の切り方のうち、最小のものを返す */
+  /* 从横向纵向两种切法中选较小的一个 */
   return memo[[w, h, diff]] = Math.min.apply(null, result);
 }
 console.log(cut_cake(16, 12, 0));
