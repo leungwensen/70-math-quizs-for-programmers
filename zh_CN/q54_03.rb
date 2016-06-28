@@ -5,13 +5,13 @@ def search(cards, num)
   return 1 if num == 0
   return @memo[cards] if @memo.has_key?(cards)
 
-  # ビット演算で挟む位置を設定
+  # 利用位运算设置包夹位置
   mask = (1 << (num + 1)) + 1
   count = 0
   while mask < (1 << (N * 2)) do
-    # 配置可能であれば、再帰的に探索
+    # 如果可以放置，则递归地搜索
     count += search(cards | mask, num - 1) if cards & mask == 0
-    # 挟む位置を一桁移動
+    # 包夹位置移动一位
     mask <<= 1
   end
   @memo[cards] = count

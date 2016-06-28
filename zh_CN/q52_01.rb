@@ -1,25 +1,25 @@
-N = 8 # 砂時計の数
-GOAL = [1] * N # すべて1になれば次に同時に下に落ちる
+N = 8 # 沙漏数目
+GOAL = [1] * N # 如果所有沙漏剩余砂量为1，则所有砂子能同时落下
 
 count = 0
-(1..N).to_a.permutation{|init| # 初期状態を順列で設定
+(1..N).to_a.permutation{|init| # 顺次设置初始状态
   hourglass = init
   pos = 0
-  log = {} # 同じ状態になるかをチェックするログ
-  while log[hourglass] != pos  # 過去に同じ状態があれば終了
-    if hourglass == GOAL then  # 目標の形に達したら終了
+  log = {} # 用于检查是否变为同样状态的记录
+  while log[hourglass] != pos  # 如果变为过去的同样状态，则终止处理
+    if hourglass == GOAL then  # 如果变为目标状态，则处理结束
       count += 1
       break
     end
     log[hourglass] = pos
 
-    # 砂時計を減らす（残っていない場合はそのまま）
+    # 减少沙漏砂量（如果上侧砂量为0，则保持为0）
     hourglass = hourglass.map{|h| h > 0 ? h - 1 : 0}
-    init[pos].times{|i|        # 砂時計を反転
+    init[pos].times{|i|        # 反转沙漏
       rev = (pos + i) % N
       hourglass[rev] = init[rev] - hourglass[rev]
     }
-    pos = (pos + 1) % N        # 次の位置に移動
+    pos = (pos + 1) % N        # 移动到下一个位置
   end
 }
 
