@@ -1,10 +1,10 @@
-# 縦線と横線
+# 竖线和横线
 @v, @h = 7, 10
 
-# 再帰的に横線を作成
+# 递归生成横线
 def make_bars(v, h)
   new_h = Array.new(h.size + v - 1, 0)
-  # 各横線のパターン数をカウント
+  # 统计各横线的情况
   v.times{|i|
     h.each_with_index{|cnt, j|
       new_h[i+j] += cnt

@@ -1,13 +1,13 @@
-/* 縦線と横線 */
+/* 竖线和横线 */
 const V = 7, H = 10;
 
-/* 再帰的に横線を作成 */
+/* 递归生成横线 */
 function make_bars(v, h){
   var new_h = new Array(h.length + v - 1);
   for (var i = 0; i < h.length + v - 1; i++){
     new_h[i] = 0;
   }
-  /* 各横線のパターン数をカウント */
+  /* 统计各横线的情况 */
   for (var i = 0; i < v; i++){
     for (var j = 0; j < h.length; j++){
       new_h[i + j] += h[j]
