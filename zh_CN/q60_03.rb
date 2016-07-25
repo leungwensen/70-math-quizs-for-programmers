@@ -1,20 +1,20 @@
-# サイズの設定
+# 设置搜索的边界
 W, H = 4, 4
-# 格子点から上下左右に線が出ているかどうか
-# U: 上, D: 下, L: 左, R: 右をビット列でセット
+# 从单元格顶点有没有往上下左右方向的线
+# U: 上, D: 下, L: 左, R: 右用比特列设置方向
 U, D, L, R = 0b1000, 0b0100, 0b0010, 0b0001
 
-# 格子点の数は内側のため、行と列が1少ない
+# 单元格顶点只计算内侧，因此行列减1
 @width, @height = W - 1, H - 1
-# 格子点として可能な形をセット（上記の説明の順番）
+# 设置单元格顶点的可能状态（按上述说明顺序）
 @dir = [U|D, L|R, U|D|L, U|D|R, U|L|R, D|L|R, U|D|L|R, 0b0]
 @cnt, @cnt1x1 = 0, 0
 @cross = []
 
 def search(pos)
-  if pos == @width * @height then # 探索終了
+  if pos == @width * @height then # 搜索结束
     @cnt += 1
-    # 1x1のセルを求める
+    # 求1x1的单元格
     cell = Array.new(W * H, true)
     @cross.each_with_index{|c, i|
       x, y = i % @width, i / @width
@@ -28,8 +28,8 @@ def search(pos)
   end
   @dir.each{|d|
     @cross[pos] = d
-    # 左端の場合、または左隣からの線が右からの線と一致する。
-    # または上端の場合、または上隣からの線が下からの線と一致する。
+    # 最左侧或者左侧的线和右侧的线重合时
+    # 最上面或者上面的线和下面的线重合时
     if ((pos % @width == 0) ||
         ((@cross[pos] & L > 0) == (@cross[pos - 1] & R > 0))) &&
        ((pos / @height == 0) ||
