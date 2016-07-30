@@ -1,5 +1,5 @@
 W, H = 6, 5
-# マス目の初期化
+# 初始化网格
 @puzzle = Array.new(W + 2).map{Array.new(H + 2, 0)}
 (W+2).times{|w|
   (H+2).times{|h|
@@ -9,7 +9,7 @@ W, H = 6, 5
   }
 }
 
-def fill(x, y, from, to)        # 連続チェック用に埋めていく
+def fill(x, y, from, to)        # 填充元素，确认是否连续
   if @puzzle[x][y] == from then
     @puzzle[x][y] = to
     fill(x - 1, y, from, to)
@@ -22,23 +22,23 @@ end
 def check()
   x, y = 1, 1
   x += 1 if @puzzle[x][y] == 1
-  fill(x, y, 0, 2)              # 白マスをダミーで埋める
+  fill(x, y, 0, 2)              # 在白色方格填入临时数据
   result = (@puzzle.flatten.count(0) == 0)
-  fill(x, y, 2, 0)              # ダミーを白マスに戻す
+  fill(x, y, 2, 0)              # 临时数据恢复为白色方格
   result
 end
 
 def search(x, y)
-  x, y = 1, y + 1 if x == W + 1 # 右端に到達したら次の行
-  return 1 if y == H + 1        # 最後まで探索できれば成功
-  cnt = search(x + 1, y)        # 白マスをセットして次を探索
-  # 左か上が黒マス以外の場合、黒マスをセットして次を探索
+  x, y = 1, y + 1 if x == W + 1 # 到达最右侧，进入下一行处理
+  return 1 if y == H + 1        # 收缩到最后则代表成功
+  cnt = search(x + 1, y)        # 设置白色方格，进入下一个搜索
+  # 除去左边或者上边是黑色方格的情况以外，设置黑色方格并进入下一个搜索
   if (@puzzle[x - 1][y] != 1) && (@puzzle[x][y - 1] != 1) then
-    @puzzle[x][y] = 1           # 黒マスをセット
+    @puzzle[x][y] = 1           # 设置黑色方格
     cnt += search(x + 1, y) if check()
-    @puzzle[x][y] = 0           # 黒マスを戻す
+    @puzzle[x][y] = 0           # 恢复黑色方格
   end
   cnt
 end
 
-p search(1, 1)                  # 左上から開始
+p search(1, 1)                  # 从左上角开始
