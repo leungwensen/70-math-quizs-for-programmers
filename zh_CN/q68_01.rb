@@ -1,23 +1,23 @@
 N = 6
 FREE, USED, WALL = 0, 1, 9
 
-# 番兵として両端と真ん中に壁をセット
+# 在两边和正中间设置墙壁做为边界
 @seat = [WALL] + [FREE] * N + [WALL] + [FREE] * N + [WALL]
 
 def search(person)
   count = 0
-  # 隣に人がいない座席を探す
+  # 搜索邻座没有人的座位
   @seat.size.times{|i|
     if @seat[i] == FREE then
       if (@seat[i - 1] != USED) && (@seat[i + 1] != USED) then
-        # 空いていれば座って、次を探索
+        # 如果有空着的座位，则坐下，接着进入下一轮搜索
         @seat[i] = USED
         count += search(person + 1)
         @seat[i] = FREE
       end
     end
   }
-  # 隣に人がいない座席があれば上記でカウントした値、その他は階乗
+  # 存在邻座没有人的座位则采用上述逻辑，剩余的数目用阶乘计算
   (count > 0) ? count : (1..@seat.count(FREE)).inject(:*)
 end
 
