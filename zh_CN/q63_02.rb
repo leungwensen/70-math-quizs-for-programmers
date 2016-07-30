@@ -1,20 +1,20 @@
 require 'date'
 WEEKS, DAYS = 6, 7
 
-# 祝日ファイルの読み込み
+# 读入假日数据文件
 @holiday = IO.readlines("q63.txt").map{|h|
   h.split('/').map(&:to_i)
 }
 
-# カレンダーを満たす最大長方形の面積を算出
+# 计算符合条件的最大长方形的面积
 def max_rectangle(cal)
   s = 0
   WEEKS.times{|row|
     DAYS.times{|left|
       (left..(DAYS - 1)).each{|right|
-        # 高さを算出
+        # 计算高度
         h = (left..right).map{|w| cal[w + row * DAYS]}
-        # 高さの最小値と横幅で面積を算出
+        # 通过高度的最小值和横向长度计算面积
         s = [s, h.min * (right - left + 1)].max
       }
     }
@@ -22,13 +22,13 @@ def max_rectangle(cal)
   s
 end
 
-# 年月を指定し、面積を取得する
+# 指定年份月份，获取最大长方形面积
 def calc(y, m)
   cal = Array.new(WEEKS * DAYS, 0)
-  first = wday = Date.new(y, m, 1).wday # 1日の曜日を取得
-  Date.new(y, m, -1).day.times{|d|      # その月の日の数だけ繰り返し
+  first = wday = Date.new(y, m, 1).wday # 获取该月1日的星期
+  Date.new(y, m, -1).day.times{|d|      # 循环处理直到该月结束
     if 1 <= wday && wday <= 5 && !@holiday.include?([y, m, d + 1])
-      # 上にいくつ平日が続いているか？
+      # 纵向工作日延续几行？
       cal[first + d] = cal[first + d - DAYS] + 1
     end
     wday = (wday + 1) % DAYS
