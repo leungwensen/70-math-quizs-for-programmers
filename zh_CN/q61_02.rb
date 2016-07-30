@@ -1,11 +1,11 @@
-# 盤面のサイズ
+# 长方形大小
 W, H = 5, 4
 @width, @height = W + 2, H + 2
 
 NONE, BLUE, WHITE, WALL = 0, 1, 2, 9
 
 map = Array.new(@width * @height, 0)
-# 外枠を作成
+# 设置外边界
 @width.times{|i|
   map[i] = WALL
   map[i + @width * (@height - 1)] = WALL
@@ -15,11 +15,11 @@ map = Array.new(@width * @height, 0)
   map[(i + 1) * @width - 1] = WALL
 }
 
-# 最初は(1, 1)からスタート
+# 从(1,1)开始
 map[@width + 1] = BLUE
 @maps = {map => false}
 
-# 選択した色で埋めることを幅優先探索で再帰的に行う
+# 采用广度优先递归地对格子涂色
 def fill(depth, color)
   return if depth == 0
   new_maps = {}
@@ -45,10 +45,10 @@ def fill(depth, color)
   fill(depth - 1, color)
 end
 
-# 青色を半分まで埋める
+# 把一半方格涂成蓝色
 fill(W * H / 2 - 1, BLUE)
 
-# 白色を空いている最初の位置に入れる
+# 把白色涂进空着的方格上
 new_maps = {}
 @maps.each{|k, v|
   pos = k.index(NONE)
@@ -58,10 +58,10 @@ new_maps = {}
 }
 @maps = new_maps
 
-# 白色を埋める
+# 涂上白色
 fill(W * H / 2 - 1, WHITE)
 
-# すべて埋まっているものをカウント
+# 统计所有方格全部上色完毕的组合
 count = 0
 @maps.each{|m|
   count += 1 if !(m.include?(NONE))
