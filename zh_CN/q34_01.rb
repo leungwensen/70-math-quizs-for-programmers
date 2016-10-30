@@ -1,4 +1,4 @@
-# 盤面の設定
+# 设置棋盘
 @board = Array.new(11).map!{Array.new(11)}
 (0..10).each{|i|
   (0..10).each{|j|
@@ -6,17 +6,17 @@
   }
 }
 
-# 集計フィールドの初期化
+# 初始化统计变量
 count = 0
 
-# 再帰的に探索
+# 递归遍历
 def search(x, y, dx, dy)
   return if @board[x][y]
   @check[x * 10 + y] = 1
   search(x + dx, y + dy, dx, dy)
 end
 
-# 飛車、角を順に設定して探索
+# 按顺序放置飞车和角行进行遍历
 (1..9).each{|hy|
   (1..9).each{|hx|
     (1..9).each{|ky|
