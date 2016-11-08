@@ -2,7 +2,11 @@ require 'date'
 WEEKS, DAYS = 6, 7
 
 # 读入假日数据文件
-@holiday = IO.readlines("q63.txt").map{|h|
+@holiday = IO.readlines("q63-holiday.txt").map{|h|
+  h.split('/').map(&:to_i)
+}
+# 读入调休工作日数据文件
+@extra_workday = IO.readlines("q63-extra-workday.txt").map{|h|
   h.split('/').map(&:to_i)
 }
 
@@ -34,7 +38,7 @@ def calc(y, m)
   cal = Array.new(WEEKS * DAYS, 0)
   first = wday = Date.new(y, m, 1).wday # 获取该月1日的星期
   Date.new(y, m, -1).day.times{|d|      # 循环处理直到该月结束
-    if 1 <= wday && wday <= 5 && !@holiday.include?([y, m, d + 1])
+    if (1 <= wday && wday <= 5 && !@holiday.include?([y, m, d + 1])) || @extra_workday.include?([y, m, d + 1])
       cal[first + d] = 1
     end
     wday = (wday + 1) % DAYS
