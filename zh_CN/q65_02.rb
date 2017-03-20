@@ -1,46 +1,42 @@
-# 6组对手
-PAIR = 6
+# 设置图块数目
+W, H = 4, 3
+row = [0] + [1] * (W - 1) + [0]
+@edge = row + row.map{|r| 1 - r} * (H - 1) + row
 
-# 设置起始和终止状态
-start = (1..PAIR * 2 - 1).to_a + [0]
-goal = [0] + (2..PAIR * 2 - 1).to_a + [1]
+def search(panel, odds)
+  # 截至最后一个图块，奇数顶点是否超过2个
+  return (@edge.inject(:+) > 2)?0:1 if panel >= (W + 1) * H
+  # 途中で奇数点が2個を超えると一筆書き不可
+  # 如果中途奇数顶点超过2个，则不可能完成一笔画
+  return 0 if odds > 2
 
-# 获取投接球状态列表
-def throwable(balls)
-  result = []
-  balls.each{|ball|
-    c = ball.index(0)                     # 获取接球手位置
-    p = (c + PAIR) % (PAIR * 2)           # 计算接球手对面位置
-    [-1, 0, 1].each{|d|                   # 正对面及其左右
-      if (p + d) / PAIR == p / PAIR then
-        ball[c], ball[p + d] = ball[p + d], ball[c]
-        result.push(ball.clone)           # 设置投球结果
-        ball[c], ball[p + d] = ball[p + d], ball[c]
-      end
-    }
-  }
-  result
+  cnt = 0
+  if panel % (W + 1) < W then   # 到达行的最右侧
+    # 遍历图块内没有斜线的情况
+    cnt += search(panel + 1, odds + @edge[panel])
+
+    # 图块有从左上到右下的线
+    @edge[panel] = 1 - @edge[panel]
+    @edge[panel + W + 2] = 1 - @edge[panel + W + 2]
+    cnt += search(panel + 1, odds + @edge[panel])
+
+    # 图块有交叉线
+    @edge[panel + 1] = 1 - @edge[panel + 1]
+    @edge[panel + W + 1] = 1 - @edge[panel + W + 1]
+    cnt += search(panel + 1, odds + @edge[panel])
+
+    # 图块有从右上到左下的线
+    @edge[panel] = 1 - @edge[panel]
+    @edge[panel + W + 2] = 1 - @edge[panel + W + 2]
+    cnt += search(panel + 1, odds + @edge[panel])
+
+    # 斜线回到原点
+    @edge[panel + 1] = 1 - @edge[panel + 1]
+    @edge[panel + W + 1] = 1 - @edge[panel + W + 1]
+  else               # 到达行右端时，进入下一行
+    cnt += search(panel + 1, odds + @edge[panel])
+  end
+  cnt
 end
 
-# 设定初始状态
-fw = [start]
-fw_log = [start]
-bw = [goal]
-bw_log = [goal]
-cnt = 0
-
-# 双向的广度优先搜索
-while true do
-  next_fw = throwable(fw)      # 正向的下一步
-  fw = next_fw - fw_log        # 选择之前没有出现过的投球方案
-  fw_log |= next_fw            # 添加投球结果
-  cnt += 1
-  break if (fw & bw).size > 0  # 如果状态相同，则终止处理
-
-  next_bw = throwable(bw)      # 反向的下一步
-  bw = next_bw - bw_log        # 选择之前没有出现过的投球方案
-  bw_log |= next_bw            # 添加投球结果
-  cnt += 1
-  break if (fw & bw).size > 0  # 如果状态相同，则终止处理
-end
-puts cnt
+puts search(0, 0)

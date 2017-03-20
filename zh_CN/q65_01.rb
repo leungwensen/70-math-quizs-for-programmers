@@ -1,36 +1,31 @@
-# 6组对手
-PAIR = 6
+# 设置图块数目
+W, H = 4, 3
+# 按位反转用的值
+XOR_ROW = (1 << (W + 1)) - 1
 
-# 设置起始和终止状态
-start = (1..PAIR * 2 - 1).to_a + [0]
-goal = [0] + (2..PAIR * 2 - 1).to_a + [1]
+# 按行搜索
+def search(up, y, odds)
+  # 截至上一行，如果奇数顶点的数目大于2，则排除这种情况
+  return 0 if 2 < odds
 
-# 获取投接球状态列表
-def throwable(balls)
-  result = []
-  balls.each{|ball|
-    c = ball.index(0)                     # 获取接球手位置
-    p = (c + PAIR) % (PAIR * 2)           # 计算接球手对面位置
-    [-1, 0, 1].each{|d|                   # 正对面及其左右
-      if (p + d) / PAIR == p / PAIR then
-        ball[c], ball[p + d] = ball[p + d], ball[c]
-        result.push(ball.clone)           # 设置投球结果
-        ball[c], ball[p + d] = ball[p + d], ball[c]
-      end
+  row = 1 << W | 1     # 设置初始值
+
+  # 翻转最初和最后的行
+  row = XOR_ROW ^ row if (y == 0) || (y == H)
+
+  if y == H then       # 如果是最后一行，则检查后结束
+    odds += (row ^ up).to_s(2).count("1")   # 计算奇数个数
+    return 1 if (odds == 0) || (odds == 2)  # 如果为0或者2，则计入结果
+    return 0
+  end
+  cnt = 0
+  (1 << W).times{|a|   # 图块内容（有无左上至右下的线条）
+    (1 << W).times{|b| # 图块内容（有无左下至右上的线条）
+      cnt += search(a ^ b << 1, y + 1,
+                    odds + (row ^ up ^ a << 1 ^ b).to_s(2).count("1"))
     }
   }
-  result
+  return cnt
 end
 
-# 设定初始状态
-balls = [start]
-log = [start]
-cnt = 0
-# 广度优先搜索
-while !balls.include?(goal) do
-  next_balls = throwable(balls)  # 获取下一步
-  balls = next_balls - log       # 选择之前没有出现过的投球方案
-  log |= next_balls              # 添加投球结果
-  cnt += 1
-end
-puts cnt
+puts search(0, 0, 0)

@@ -1,26 +1,22 @@
-N = 8 # 沙漏数目
-GOAL = [1] * N # 如果所有沙漏剩余砂量为1，则所有砂子能同时落下
+M, N = 6, 5   # 设置“糖果包装纸”和“糖果本身”的数目
+@memo = {}    # 内存化所用的哈希表
 
-count = 0
-(1..N).to_a.permutation{|init| # 顺次设置初始状态
-  hourglass = init
-  pos = 0
-  log = {} # 用于检查是否变为同样状态的记录
-  while log[hourglass] != pos  # 如果变为过去的同样状态，则终止处理
-    if hourglass == GOAL then  # 如果变为目标状态，则处理结束
-      count += 1
-      break
+def search(candy, color)
+  return 1 if candy == [0] * N          # 所有糖果都包好了
+  # 如果存在内存化的结果，则使用
+  return @memo[candy + [color]] if @memo.has_key?(candy + [color])
+
+  # 统计包装纸和糖果口味不一致的组合
+  cnt = 0
+  candy.size.times{|i|
+    if i != (color % candy.size) then   # 不一致的情况
+      if candy[i] > 0 then              # 还剩下糖果的情况
+        candy[i] -= 1
+        cnt += search(candy, color + 1) # 进入下一层搜索
+        candy[i] += 1
+      end
     end
-    log[hourglass] = pos
-
-    # 减少沙漏砂量（如果上侧砂量为0，则保持为0）
-    hourglass = hourglass.map{|h| h > 0 ? h - 1 : 0}
-    init[pos].times{|i|        # 反转沙漏
-      rev = (pos + i) % N
-      hourglass[rev] = init[rev] - hourglass[rev]
-    }
-    pos = (pos + 1) % N        # 移动到下一个位置
-  end
-}
-
-puts count
+  }
+  @memo[candy + [color]] = cnt   # 把糖果的数目和颜色保存起来
+end
+puts search([M] * N, 0)

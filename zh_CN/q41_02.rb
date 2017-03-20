@@ -1,19 +1,21 @@
-val = []
-256.times{|i|
-  # 反转0~255
-  rev = ('%08b'%i).reverse.to_i(2)
-
-  if i < rev then
-    s = i.to_s + rev.to_s
-    # 如果使用了0~9这10个数字个一次，就符合条件
-    val.push([i, rev]) if s.split('').uniq.size == s.length
+@found = false
+@op = ['+', '-', '*', '/', '']
+def check(n, expr, num)
+  if n == 0 then
+    if eval(expr) == 1234 then
+      puts expr
+      @found = true
+    end
+  else
+    @op.each{|i|
+      check(n - 1, "#{expr}#{i}#{num}", num)
+    }
   end
-}
-
-ip = []
-val.combination(2){|a, b|
-  # 使用了0~9这10个数字个一次，就形成分组
-  ip.push([a, b]) if (a + b).join.split('').uniq.size == 10
-}
-# 组合各分组输出结果
-puts ip.size * 8
+end
+len = 1
+while !@found do
+  (1..9).to_a.each{|num|
+    check(len, num, num)
+  }
+  len += 1
+end

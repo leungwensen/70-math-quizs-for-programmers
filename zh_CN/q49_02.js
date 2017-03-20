@@ -1,33 +1,48 @@
-const N = 8; /* 各色卡片数目 */
-var start = (1 << N) - 1; /* 开始状态(0N个，1N个) */
-var mask = (1 << N * 2) - 1; /* 掩码 */
+const W = 6; /* 横向的方格数目 */
+const H = 5; /* 纵向的方格数目 */
+const USABLE = 2; /* 同一条直线可以使用的次数 */
+var max = 0; /* 最长距离 */
+var h = new Array(H + 1); /* 保存水平方向线的使用次数 */
+var v = new Array(W + 1); /* 保存垂直方向线的使用次数 */
 
-/* 目标状态（0和1交错排列） */
-var goal1 = 0;
-for (var i = 0; i < N; i++){ goal1 = (goal1 << 2) + 1; }
-var goal2 = mask - goal1;
+for (var i = 0; i < H + 1; i++){ h[i] = 0; }
+for (var i = 0; i < W + 1; i++){ v[i] = 0; }
 
-/* 对值为1的数位进行计数 */
-function bitcount(x) {
-  x = (x & 0x55555555) + (x >> 1 & 0x55555555);
-  x = (x & 0x33333333) + (x >> 2 & 0x33333333);
-  x = (x & 0x0F0F0F0F) + (x >> 4 & 0x0F0F0F0F);
-  x = (x & 0x00FF00FF) + (x >> 8 & 0x00FF00FF);
-  x = (x & 0x0000FFFF) + (x >> 16 & 0x0000FFFF);
-  return x;
+function sum(a) {
+  return a.reduce(function(x, y) { return x + y; });
 }
 
-/* 反转次数 */
-var count = N * 2;
-for (var i = 0; i < (1 << N * 2); i++){
-  var turn = i ^ (i << 1) ^ (i << 2);
-  turn = (turn ^ (turn >> (N * 2))) & mask;
-
-  /* 到达目标状态后找出反转位置数字的最小值 */
-  if (((start ^ turn) == goal1) || ((start ^ turn) == goal2)){
-    if (count > bitcount(i)){
-      count = bitcount(i);
+function search(x, y){
+  if ((x == W) && (y == H)){
+    /* 如果到达了B点，则确认最大值，终止搜索 */
+    max = Math.max(sum(h) + sum(v), max);
+    return;
+  }
+  if (h[y] < USABLE){ /* 可以水平方向移动的时候 */
+    if (x > 0) { /* 向左移动 */
+      h[y] += 1;
+      search(x - 1, y);
+      h[y] -= 1;
+    }
+    if (x < W) { /* 向右移动 */
+      h[y] += 1;
+      search(x + 1, y);
+      h[y] -= 1;
+    }
+  }
+  if (v[x] < USABLE){ /* 可以垂直方向移动的时候 */
+    if (y > 0){ /* 向上移动 */
+      v[x] += 1;
+      search(x, y - 1);
+      v[x] -= 1;
+    }
+    if (y < H){ /* 向下移动 */
+      v[x] += 1;
+      search(x, y + 1);
+      v[x] -= 1;
     }
   }
 }
-console.log(count);
+
+search(0, 0); /* 从A位置开始 */
+console.log(max);

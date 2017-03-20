@@ -1,23 +1,30 @@
-N = 4
-@count = Hash.new(0)
+N = 16
+def graycode(value)
+  # N進数を各桁の配列に分解
+  digits = []
+  while value > 0
+    digits << value % N
+    value /= N
+  end
 
-def search()
-  # 把各行设置为数值
-  (0..(2**N-1)).to_a.repeated_permutation(N).each{|rows|
-    # 计算各列○的个数
-    col_count = Array.new(N, 0)
-    N.times{|c|
-      rows.each{|r|
-        col_count[c] += 1 if (r & (1 << c) > 0)
-      }
-    }
-    # 计算各行○的个数
-    row_count = rows.map{|r| r.to_s(2).count("1")}
-    # 用哈希表记录行和列组合的出现次数
-    @count[row_count + col_count] += 1
+  # 各桁をグレイコードに変換
+  (digits.size - 1).times{|i|
+    digits[i] = (digits[i] - digits[i + 1]) % N
   }
+  # 配列を数値に変換
+  digits.each_with_index.map{|d, i| d * (N**i)}.inject(:+)
 end
 
-search()
-# 输出只出现一次的组合
-puts @count.select{|k, v| v == 1}.count
+# 最初に戻るまで探索
+def search(value)
+  check = graycode(value)
+  cnt = 1
+  while check != value do
+    check = graycode(check)
+    cnt += 1
+  end
+  cnt
+end
+
+puts search(0x808080)
+puts search(0xabcdef)

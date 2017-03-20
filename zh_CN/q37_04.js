@@ -1,39 +1,43 @@
-function next_dice(dice){
-  var top = parseInt(dice / Math.pow(6, 5));
-  var left = parseInt(dice / Math.pow(6, 5 - top));
-  var right = dice % Math.pow(6, 5 - top);
-  return (right + 1) * Math.pow(6, top + 1) - (left + 1);
+bit = [0b1111110, 0b0110000, 0b1101101, 0b1111001, 0b0110011,
+       0b1011011, 0b1011111, 0b1110000, 0b1111111, 0b1111011];
+
+/* 统计比特序列中1的个数 */
+function bitcount(x) {
+  x = (x & 0x55555555) + (x >> 1 & 0x55555555);
+  x = (x & 0x33333333) + (x >> 2 & 0x33333333);
+  x = (x & 0x0F0F0F0F) + (x >> 4 & 0x0F0F0F0F);
+  x = (x & 0x00FF00FF) + (x >> 8 & 0x00FF00FF);
+  x = (x & 0x0000FFFF) + (x >> 16 & 0x0000FFFF);
+  return x;
 }
 
-var all_dice = new Array(Math.pow(6, 6));
-for (i = 0; i < Math.pow(6, 6); i++){
-  all_dice[i] = 0;
+var flip = new Array(10);
+for (i = 0; i < 10; i++){
+  flip[i] = new Array(10);
+  for (j = 0; j < 10; j++){
+    flip[i][j] = bitcount(bit[i]^bit[j]);
+  }
 }
-for (i = 0; i < Math.pow(6, 6); i++){
-  if (all_dice[i] == 0){
-    check = new Array();
-    while ((all_dice[i] == 0) && (check.indexOf(i) == -1)){
-      check.push(i);
-      i = next_dice(i);
-    }
-    index = check.indexOf(i);
-    if (index >= 0){
-      for (j = 0; j < check.length; j++){
-        if (j < index){
-          all_dice[check[j]] = 1;
-        } else {
-          all_dice[check[j]] = 2;
-        }
-      }
-    } else {
-      for (j = 0; j < check.length; j++){
-        all_dice[check[j]] = 1;
+
+var min = 63;
+function search(is_used, sum, prev){
+  if (is_used.indexOf(false) == -1){
+    min = sum;
+  } else {
+    for (var i = 0; i < 10; i++){
+      if (!is_used[i]){
+        is_used[i] = true;
+        var next_sum = 0;
+        if (prev >= 0)
+          next_sum = sum + flip[prev][i];
+        if (min > next_sum)
+          search(is_used, next_sum, i);
+        is_used[i] = false;
       }
     }
   }
 }
-cnt = 0;
-for (i = 0; i < Math.pow(6, 6); i++){
-  if (all_dice[i] == 1) cnt++;
-}
-console.log(cnt);
+is_used = [false, false, false, false, false,
+           false, false, false, false, false];
+search(is_used, 0, -1)
+console.log(min);

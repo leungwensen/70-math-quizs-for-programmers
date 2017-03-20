@@ -1,11 +1,14 @@
-count = 0
-(1..7).to_a.permutation.each{|ary|
-  ary.size.times{|i|
-    j = ary.index(i + 1)
-    if i != j then
-      ary[i], ary[j] = ary[j], ary[i]
-      count += 1
-    end
+N = 4
+
+def search(rows)
+  return 1 if rows.size == N # 已搜索完所有行，结束搜索
+  count = 0
+  (2**N).times{|row|
+    # 四个对角○和×是否交错出现
+    cross = rows.select{|r| (row & ~r) > 0 && (~row & r) > 0}
+    count += search(rows + [row]) if cross.count == 0
   }
-}
-puts count
+  count
+end
+
+puts search([])

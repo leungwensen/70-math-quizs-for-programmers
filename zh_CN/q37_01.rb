@@ -1,24 +1,18 @@
-# 获取下一个数字序列
-def next_dice(dice)
-  right = dice.slice!(0..(dice[0].to_i - 1)).tr('123456','654321')
-  dice += right
-end
+# 定义表示0〜9数字的比特序列
+bit = [0b1111110, 0b0110000, 0b1101101, 0b1111001, 0b0110011,
+       0b1011011, 0b1011111, 0b1110000, 0b1111111, 0b1111011]
 
-count = 0
-(6**6).times{|i|
-  # 用六进制数表示的话，只需加上“111111”就变为1～6之间了
-  dice = (i.to_s(6).to_i + 111111).to_s
-  check = Hash.new
-  j = 0
+# 每次设置翻转比特序列的值为初始值
+min = 63
 
-  # 找下一个序列直到进入循环
-  while !check.has_key?(dice) do
-    check[dice] = j
-    dice = next_dice(dice)
-    j += 1
-  end
-
-  # 定位循环位置，如果在循环范围外，则计数
-  count += 1 if check[dice] > 0
+# 在0～9组成的序列中，检索替换次数最少的序列
+(0..9).to_a.permutation.each{|seq|
+  sum = 0
+  (seq.size - 1).times{|j|
+    # 执行异或运算，计算结果中1的个数
+    sum += (bit[seq[j]]^bit[seq[j+1]]).to_s(2).count("1")
+    break if min <= sum
+  }
+  min = sum if min > sum
 }
-puts count
+puts min

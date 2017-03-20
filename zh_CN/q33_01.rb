@@ -1,20 +1,40 @@
-# 集計フィールド
-@count = 0
+# 设置棋盘
+@board = Array.new(11).map!{Array.new(11)}
+(0..10).each{|i|
+  (0..10).each{|j|
+    @board[i][j] = (i == 0) || (i == 10) || (j == 0) || (j == 10)
+  }
+}
 
-# 再帰的に検索
-def search(list, len)
-  if list.length == 1 then # 一意に識別できたとき
-    @count += len - 1
-  else
-    # 複数存在するとき、1文字増やして調査
-    list.uniq{|x| x[0, len]}.each{|k|
-      search(list.select{|x| x.start_with?(k[0, len])}, len + 1)
-    }
-  end
+# 初始化统计变量
+count = 0
+
+# 递归遍历
+def search(x, y, dx, dy)
+  return if @board[x][y]
+  @check[x * 10 + y] = 1
+  search(x + dx, y + dy, dx, dy)
 end
 
-# CSVファイルから「かな」の列を配列にセットし、転置
-$<.drop(1).map{|e| e.split(',')[3,2]}.transpose.each{|ku|
-  search(ku, 1)
+# 按顺序放置飞车和角行进行遍历
+(1..9).each{|hy|
+  (1..9).each{|hx|
+    (1..9).each{|ky|
+      (1..9).each{|kx|
+        if (hx != kx) || (hy != ky) then
+          @check = Hash.new()
+          @board[hx][hy] = @board[kx][ky] = true
+          [[-1, 0], [1, 0], [0, -1], [0, 1]].each{|hd|
+            search(hx+hd[0], hy+hd[1], hd[0], hd[1])
+          }
+          [[-1, -1], [-1, 1], [1, -1], [1, 1]].each{|kd|
+            search(kx+kd[0], ky+kd[1], kd[0], kd[1])
+          }
+          @board[hx][hy] = @board[kx][ky] = false
+          count += @check.size
+        end
+      }
+    }
+  }
 }
-puts @count
+puts count

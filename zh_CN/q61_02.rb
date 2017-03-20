@@ -1,69 +1,44 @@
-# 长方形大小
+# 设置方格点数目
 W, H = 5, 4
-@width, @height = W + 2, H + 2
+# 移动方向
+@move = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+@log = {}
 
-NONE, BLUE, WHITE, WALL = 0, 1, 2, 9
-
-map = Array.new(@width * @height, 0)
-# 设置外边界
-@width.times{|i|
-  map[i] = WALL
-  map[i + @width * (@height - 1)] = WALL
-}
-@height.times{|i|
-  map[i * @width] = WALL
-  map[(i + 1) * @width - 1] = WALL
-}
-
-# 从(1,1)开始
-map[@width + 1] = BLUE
-@maps = {map => false}
-
-# 采用广度优先递归地对格子涂色
-def fill(depth, color)
-  return if depth == 0
-  new_maps = {}
-  W.times{|w|
-    H.times{|h|
-      pos = w + 1 + (h + 1) * @width
-      @maps.each{|k, v|
-        check = false
-        if k[pos] == 0 then
-          [1, -1, @width, -@width].each{|d|
-            check = true if k[pos + d] == color
-          }
-        end
-        if check then
-          m = k.clone
-          m[pos] = color
-          new_maps[m] = false
-        end
-      }
-    }
+# 递归遍历
+def search(x, y, depth)
+  return 0 if x < 0 || W <= x || y < 0 || H <= y
+  return 0 if @log.has_key?(x + y * W)
+  return 1 if depth == W * H
+  # 遍历到一半，检查剩下的点是否连结
+  if depth == W * H / 2 then
+    remain = (0..(W*H-1)).to_a - @log.keys
+    check(remain, remain[0])
+    return 0 if remain.size > 0
+  end
+  cnt = 0
+  @log[x + y * W] = depth
+  @move.each{|m| # 上下左右移动
+    cnt += search(x + m[0], y + m[1], depth + 1)
   }
-  @maps = new_maps
-  fill(depth - 1, color)
+  @log.delete(x + y * W)
+  return cnt
 end
 
-# 把一半方格涂成蓝色
-fill(W * H / 2 - 1, BLUE)
+# 检查是否连结
+def check(remain, del)
+  remain.delete(del)
+  left, right, up, down = del - 1, del + 1, del - W, del + W
+  # 如果前方是同色的，则检索
+  check(remain, left) if (del % W > 0) && remain.include?(left)
+  check(remain, right) if (del % W != W - 1) && remain.include?(right)
+  check(remain, up) if (del / W > 0) && remain.include?(up)
+  check(remain, down) if (del / W != H - 1) && remain.include?(down)
+end
 
-# 把白色涂进空着的方格上
-new_maps = {}
-@maps.each{|k, v|
-  pos = k.index(NONE)
-  m = k.clone
-  m[pos] = WHITE
-  new_maps[m] = false
-}
-@maps = new_maps
-
-# 涂上白色
-fill(W * H / 2 - 1, WHITE)
-
-# 统计所有方格全部上色完毕的组合
 count = 0
-@maps.each{|m|
-  count += 1 if !(m.include?(NONE))
+(W * H).times{|i|
+  count += search(i % W, i / W, 1)
 }
-puts count
+
+# 起点终点互换位置得到的路径和原先一致，所以最终数目减半
+puts count / 2

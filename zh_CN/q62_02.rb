@@ -1,44 +1,44 @@
-# 设置方格点数目
-W, H = 5, 4
-# 移动方向
-@move = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-@log = {}
+require 'date'
+WEEKS, DAYS = 6, 7
 
-# 递归遍历
-def search(x, y, depth)
-  return 0 if x < 0 || W <= x || y < 0 || H <= y
-  return 0 if @log.has_key?(x + y * W)
-  return 1 if depth == W * H
-  # 遍历到一半，检查剩下的点是否连结
-  if depth == W * H / 2 then
-    remain = (0..(W*H-1)).to_a - @log.keys
-    check(remain, remain[0])
-    return 0 if remain.size > 0
-  end
-  cnt = 0
-  @log[x + y * W] = depth
-  @move.each{|m| # 上下左右移动
-    cnt += search(x + m[0], y + m[1], depth + 1)
-  }
-  @log.delete(x + y * W)
-  return cnt
-end
-
-# 检查是否连结
-def check(remain, del)
-  remain.delete(del)
-  left, right, up, down = del - 1, del + 1, del - W, del + W
-  # 如果前方是同色的，则检索
-  check(remain, left) if (del % W > 0) && remain.include?(left)
-  check(remain, right) if (del % W != W - 1) && remain.include?(right)
-  check(remain, up) if (del / W > 0) && remain.include?(up)
-  check(remain, down) if (del / W != H - 1) && remain.include?(down)
-end
-
-count = 0
-(W * H).times{|i|
-  count += search(i % W, i / W, 1)
+# 读入假日数据文件
+@holiday = IO.readlines("q62-holiday.txt").map{|h|
+  h.split('/').map(&:to_i)
+}
+# 读入调休工作日数据文件
+@extra_workday = IO.readlines("q62-extra-workday.txt").map{|h|
+  h.split('/').map(&:to_i)
 }
 
-# 起点终点互换位置得到的路径和原先一致，所以最终数目减半
-puts count / 2
+# 计算符合条件的最大长方形的面积
+def max_rectangle(cal)
+  s = 0
+  WEEKS.times{|row|
+    DAYS.times{|left|
+      (left..(DAYS - 1)).each{|right|
+        # 计算高度
+        h = (left..right).map{|w| cal[w + row * DAYS]}
+        # 通过高度的最小值和横向长度计算面积
+        s = [s, h.min * (right - left + 1)].max
+      }
+    }
+  }
+  s
+end
+
+# 指定年份月份，获取最大长方形面积
+def calc(y, m)
+  cal = Array.new(WEEKS * DAYS, 0)
+  first = wday = Date.new(y, m, 1).wday # 获取该月1日的星期
+  Date.new(y, m, -1).day.times{|d|      # 循环处理直到该月结束
+    if (1 <= wday && wday <= 5 && !@holiday.include?([y, m, d + 1])) || @extra_workday.include?([y, m, d + 1])
+      # 纵向工作日延续几行？
+      cal[first + d] = cal[first + d - DAYS] + 1
+    end
+    wday = (wday + 1) % DAYS
+  }
+  max_rectangle(cal)
+end
+
+yyyymm = [*2006..2015].product([*1..12])
+puts yyyymm.map{|y ,m| calc(y, m)}.inject(:+)

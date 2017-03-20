@@ -1,15 +1,17 @@
-op = ['+', '-', '*', '/', '']
-found = false
-len = 1
-while !found do
-  op.repeated_permutation(len){|o|
-    (1..9).to_a.each{|i|
-      expr = o.inject(i.to_s){|l, n| l + n + i.to_s}
-      if eval(expr) == 1234 then
-        puts expr
-        found = true
-      end
-    }
-  }
-  len += 1
+n = 5
+
+# 设置初始值
+cards = [(1..n*2).to_a]
+answer = (1..n*2).to_a.reverse
+
+depth = 1
+while true do
+  # 搜索
+  cards = cards.each_with_object([]) do |c, result|
+    1.upto(n){|i| result << c[i, n] + c[0, i] + c[i + n..-1]}
+  end
+  break if cards.include?(answer)
+  depth += 1
 end
+
+puts depth

@@ -1,20 +1,13 @@
-N = 9
-@max = 0
-@max_list = Hash.new
+ip = Array.new
+(1 << 16).times{|i|
+  # 反转16位的数字
+  j = ('%016b' % i).reverse.to_i(2)
 
-def solve(cards, init, depth)
-  if cards[0] == 1 then
-    if @max < depth then
-      @max = depth
-      @max_list.clear
-    end
-    @max_list[init] = cards if @max == depth
-  else
-    solve(cards[0..(cards[0] - 1)].reverse + cards[cards[0]..N],
-          init, depth + 1)
-  end
-end
+  # 生成分割的十进制数字符串
+  s = '%d.%d.%d.%d' % [i>>8, i&0xff, j>>8, j&0xff]
 
-(1..N).to_a.permutation.each{|i| solve(i, i, 0)}
-puts @max
-puts @max_list
+  # 如果只用到了10个数字和点号，则符合条件
+  ip.push(s) if s.split("").uniq.length == 11
+}
+puts ip.size
+puts ip

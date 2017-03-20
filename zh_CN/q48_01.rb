@@ -1,30 +1,21 @@
-N = 16
-def graycode(value)
-  # N進数を各桁の配列に分解
-  digits = []
-  while value > 0
-    digits << value % N
-    value /= N
+N = 8                     # 各色卡片数目
+start = (1 << N) - 1      # 开始状态(0N个，1N个)
+mask = (1 << N * 2) - 1   # 掩码
+
+# 目标状态（0和1交错排列）
+goal1 = 0
+N.times{|i| goal1 = (goal1 << 2) + 1}
+goal2 = mask - goal1
+
+# 反转次数
+count = N * 2
+(1 << N*2).times{|i|   # 表示开始反转位置的比特列
+  turn = i ^ (i << 1) ^ (i << 2)
+  turn = (turn ^ (turn >> (N * 2))) & mask
+
+  # 到达目标状态后找出反转位置数字的最小值
+  if (start ^ turn == goal1) || (start ^ turn == goal2) then
+    count = [count, i.to_s(2).count('1')].min
   end
-
-  # 各桁をグレイコードに変換
-  (digits.size - 1).times{|i|
-    digits[i] = (digits[i] - digits[i + 1]) % N
-  }
-  # 配列を数値に変換
-  digits.each_with_index.map{|d, i| d * (N**i)}.inject(:+)
-end
-
-# 最初に戻るまで探索
-def search(value)
-  check = graycode(value)
-  cnt = 1
-  while check != value do
-    check = graycode(check)
-    cnt += 1
-  end
-  cnt
-end
-
-puts search(0x808080)
-puts search(0xabcdef)
+}
+puts count

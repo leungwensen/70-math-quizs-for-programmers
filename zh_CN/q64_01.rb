@@ -1,42 +1,36 @@
-N = 5
-# 右手法则的移动方向（按右、上、左、下的顺序）
-@dx = [[1, 0], [0, -1], [-1, 0], [0, 1]]
+# 6组对手
+PAIR = 6
 
-# maze: 墙壁设置
-# p1, d1: 第1个人走过的路径和移动方向
-# p2, d2: 第2个人走过的路径和移动方向
-def search(maze, p1, d1, p2, d2)
-    if p1.size == p2.size then # 两人同时移动的情况
-        # 两人相遇则成功
-        return true if p1[-1][0..1] == p2[01][0..1]
-        # 第1个人到达右下方则失败
-        return false if p1[-1][0..1] == [N - 1, N - 1]
-        # 第2个人到达左上方则失败
-        return false if p2[-1][0..1] == [0, 0]
-    end
-    # 两人往同一个方向移动则移动方向形成环，失败
-    return false if p1.count(p1[-1]) > 1
+# 设置起始和终止状态
+start = (1..PAIR * 2 - 1).to_a + [0]
+goal = [0] + (2..PAIR * 2 - 1).to_a + [1]
 
-    pre = p1[-1]
-    @dx.size.times{|i| # 搜索右手法则指定的方向
-        d = (d1 - 1 + i) % @dx.size
-        px = pre[0] + @dx[d][0]
-        py = pre[1] + @dx[d][1]
-        # 判断移动前方是否是墙壁
-        if (px >= 0) && (px < N) && (py >= 0) && (py < N) && (maze[px + N * py] == 0) then
-            return search(maze, p2, d2, p1 + [[px, py, d]], d)
-            break
-        end
+# 获取投接球状态列表
+def throwable(balls)
+  result = []
+  balls.each{|ball|
+    c = ball.index(0)                     # 获取接球手位置
+    p = (c + PAIR) % (PAIR * 2)           # 计算接球手对面位置
+    [-1, 0, 1].each{|d|                   # 正对面及其左右
+      if (p + d) / PAIR == p / PAIR then
+        ball[c], ball[p + d] = ball[p + d], ball[c]
+        result.push(ball.clone)           # 设置投球结果
+        ball[c], ball[p + d] = ball[p + d], ball[c]
+      end
     }
-    false
+  }
+  result
 end
 
-a = [[0, 0, -1]]            # A: 左上角（X坐标，Y坐标、向前的移动方向）
-b = [[N - 1, N - 1, -1]]    # B: 右下角（X坐标，Y坐标、向前的移动方向）
+# 设定初始状态
+balls = [start]
+log = [start]
 cnt = 0
-[0, 1].repeated_permutation(N * N - 2){|maze|
-    # 两人的起始位置一定作为路径的一部分检索
-    # A向下移动（@dx[3]）、B向上移动（@dx[1]）
-    cnt += 1 if search([0] + maze + [0], a, 3, b, 1)
-}
+# 广度优先搜索
+while !balls.include?(goal) do
+  next_balls = throwable(balls)  # 获取下一步
+  balls = next_balls - log       # 选择之前没有出现过的投球方案
+  log |= next_balls              # 添加投球结果
+  cnt += 1
+end
 puts cnt

@@ -1,18 +1,33 @@
-# 定义表示0〜9数字的比特序列
-bit = [0b1111110, 0b0110000, 0b1101101, 0b1111001, 0b0110011,
-       0b1011011, 0b1011111, 0b1110000, 0b1111111, 0b1111011]
-
-# 每次设置翻转比特序列的值为初始值
-min = 63
-
-# 在0～9组成的序列中，检索替换次数最少的序列
-(0..9).to_a.permutation.each{|seq|
-  sum = 0
-  (seq.size - 1).times{|j|
-    # 执行异或运算，计算结果中1的个数
-    sum += (bit[seq[j]]^bit[seq[j+1]]).to_s(2).count("1")
-    break if min <= sum
+# 设置反转用的掩码
+mask = Array.new(16)
+4.times{|row|
+  4.times{|col|
+    mask[row * 4 + col] =
+      (0b1111 << (row * 4)) | (0b1000100010001 << col)
   }
-  min = sum if min > sum
 }
-puts min
+
+max = 0
+# 保存步骤数目的数组
+steps = Array.new(1 << 16, -1)
+# 从所有方格都为白色开始
+steps[0] = 0
+# 检查对象的数组
+scanner = [0]
+while scanner.size > 0 do
+  check = scanner.shift
+  next_steps = steps[check] + 1
+  16.times{|i|
+    n = check ^ mask[i]
+    # 如果未检查过，则进一步检索
+    if steps[n] == -1 then
+      steps[n] = next_steps
+      scanner.push(n)
+      max = next_steps if max < next_steps
+    end
+  }
+end
+
+puts max # 最大步骤数
+puts steps.index(max).to_s(2) # 初始状态的方格：全部黑色
+p steps.select{|i| i == -1} # 不存在不能全部变为白色的初始状态

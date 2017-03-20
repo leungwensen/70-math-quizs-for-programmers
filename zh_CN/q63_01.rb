@@ -1,50 +1,42 @@
-require 'date'
-WEEKS, DAYS = 6, 7
+N = 5
+# 右手法则的移动方向（按右、上、左、下的顺序）
+@dx = [[1, 0], [0, -1], [-1, 0], [0, 1]]
 
-# 读入假日数据文件
-@holiday = IO.readlines("q63-holiday.txt").map{|h|
-  h.split('/').map(&:to_i)
-}
-# 读入调休工作日数据文件
-@extra_workday = IO.readlines("q63-extra-workday.txt").map{|h|
-  h.split('/').map(&:to_i)
-}
-
-# 计算符合条件的最大长方形的面积
-def max_rectangle(cal)
-  rect = 0
-  WEEKS.times{|sr|          # 起始行
-    DAYS.times{|sc|         # 起始列
-      sr.upto(WEEKS){|er|   # 终点行
-        sc.upto(DAYS){|ec|  # 终点列
-          is_weekday = true # 起始点和终点之间有没有工作日以外的日子
-          sr.upto(er){|r|
-            sc.upto(ec){|c|
-              is_weekday = false if cal[c + r * DAYS] == 0
-            }
-          }
-          if is_weekday then
-            rect = [rect, (er - sr + 1) * (ec - sc + 1)].max
-          end
-        }
-      }
-    }
-  }
-  rect
-end
-
-# 指定年份月份，获取最大长方形面积
-def calc(y, m)
-  cal = Array.new(WEEKS * DAYS, 0)
-  first = wday = Date.new(y, m, 1).wday # 获取该月1日的星期
-  Date.new(y, m, -1).day.times{|d|      # 循环处理直到该月结束
-    if (1 <= wday && wday <= 5 && !@holiday.include?([y, m, d + 1])) || @extra_workday.include?([y, m, d + 1])
-      cal[first + d] = 1
+# maze: 墙壁设置
+# p1, d1: 第1个人走过的路径和移动方向
+# p2, d2: 第2个人走过的路径和移动方向
+def search(maze, p1, d1, p2, d2)
+    if p1.size == p2.size then # 两人同时移动的情况
+        # 两人相遇则成功
+        return true if p1[-1][0..1] == p2[01][0..1]
+        # 第1个人到达右下方则失败
+        return false if p1[-1][0..1] == [N - 1, N - 1]
+        # 第2个人到达左上方则失败
+        return false if p2[-1][0..1] == [0, 0]
     end
-    wday = (wday + 1) % DAYS
-  }
-  max_rectangle(cal)
+    # 两人往同一个方向移动则移动方向形成环，失败
+    return false if p1.count(p1[-1]) > 1
+
+    pre = p1[-1]
+    @dx.size.times{|i| # 搜索右手法则指定的方向
+        d = (d1 - 1 + i) % @dx.size
+        px = pre[0] + @dx[d][0]
+        py = pre[1] + @dx[d][1]
+        # 判断移动前方是否是墙壁
+        if (px >= 0) && (px < N) && (py >= 0) && (py < N) && (maze[px + N * py] == 0) then
+            return search(maze, p2, d2, p1 + [[px, py, d]], d)
+            break
+        end
+    }
+    false
 end
 
-yyyymm = [*2006..2015].product([*1..12])
-puts yyyymm.map{|y ,m| calc(y, m)}.inject(:+)
+a = [[0, 0, -1]]            # A: 左上角（X坐标，Y坐标、向前的移动方向）
+b = [[N - 1, N - 1, -1]]    # B: 右下角（X坐标，Y坐标、向前的移动方向）
+cnt = 0
+[0, 1].repeated_permutation(N * N - 2){|maze|
+    # 两人的起始位置一定作为路径的一部分检索
+    # A向下移动（@dx[3]）、B向上移动（@dx[1]）
+    cnt += 1 if search([0] + maze + [0], a, 3, b, 1)
+}
+puts cnt

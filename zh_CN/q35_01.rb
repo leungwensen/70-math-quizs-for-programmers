@@ -1,17 +1,16 @@
-N = 6
-@cnt = 0
-def search(man_x, man_y, woman_x, woman_y, meet)
-  if (man_x <= N) && (man_y <= N) &&
-     (woman_x >= 0) && (woman_y >= 0) then
-    @cnt += 1 if (man_x == N) && (man_y == N) && (meet >= 2)
-    meet += 1 if (man_x == woman_x)
-    meet += 1 if (man_y == woman_y)
-    search(man_x + 1, man_y, woman_x - 1, woman_y, meet)
-    search(man_x + 1, man_y, woman_x, woman_y - 1, meet)
-    search(man_x, man_y + 1, woman_x - 1, woman_y, meet)
-    search(man_x, man_y + 1, woman_x, woman_y - 1, meet)
+n = (1..50).select{|i| (i % 2 > 0) || (i % 5 > 0)}
+answer = Array.new
+k = 1
+while (n.size > 0) do
+  x = k.to_s(2).to_i * 7
+  if x.to_s.include?('0') then
+    n.each{|i|
+      if x % i == 0 then
+        answer << i if x.to_s == x.to_s.reverse
+        n.delete(i)
+      end
+    }
   end
+  k += 1
 end
-
-search(0, 0, N, N, 0)
-puts @cnt
+puts answer.sort

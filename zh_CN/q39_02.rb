@@ -4,7 +4,7 @@ N = 9
 
 def solve(cards, init, depth)
   if cards[0] == 1 then
-    if @max < depth then
+    if @max < depth
       @max = depth
       @max_list.clear
     end
@@ -15,6 +15,16 @@ def solve(cards, init, depth)
   end
 end
 
-(1..N).to_a.permutation.each{|i| solve(i, i, 0)}
+def pattern(used, unused, index)
+  if unused.empty?
+    solve(used, used, 0)
+  else
+    unused.select{|i| index + 1 != i}.each{|i|
+      pattern(used + [i], unused - [i], index + 1)
+    }
+  end
+end
+
+pattern([], (1..N).to_a, 0)
 puts @max
 puts @max_list

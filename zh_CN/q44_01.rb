@@ -1,27 +1,27 @@
-def search(abc, depth, max_abc, log)
-  return false if log.has_key?(abc)        # 搜索完成
-  return true if abc[0] == max_abc[0] / 2  # 终止条件
-  log[abc] = depth
-  [0, 1, 2].permutation(2).each{|i, j|
-    # 从A,B,C中选择2个开始倒水
-    if (abc[i] > 0) || (abc[j] < max_abc[j])
-      next_abc = abc.clone
-      move = [abc[i], max_abc[j] - abc[j]].min
-      next_abc[i] -= move
-      next_abc[j] += move
-      return true if search(next_abc, depth + 1, max_abc, log)
-    end
-  }
-  false
-end
+require "prime"
+
+# 获取3位的质数
+primes = Prime.each(1000).select{|i| i >= 100}
+
+# 以首位数字生成哈希表
+prime_h = {0 => []}
+primes.chunk{|i| i / 100}.each{|k, v|
+  prime_h[k] = v
+}
 
 cnt = 0
-10.step(100, 2){|a|
-  (1..(a/2 - 1)).each{|c|
-    b = a - c
-    if b.gcd(c) == 1 then # 互质，也就是最大公约数为1
-      cnt += 1 if search([a, 0, 0], 0, [a, b, c], {})
-    end
+primes.each{|r1|                     # 第1行
+  prime_h[r1 / 100].each{|c1|        # 第1列
+    prime_h[r1 % 100 / 10].each{|c2| # 第2列
+      prime_h[r1 % 10].each{|c3|     # 第3列
+        r2 = (c1 % 100 / 10) * 100 + (c2 % 100 / 10) * 10 +
+             (c3 % 100 / 10)
+        r3 = (c1 % 10) * 100 + (c2 % 10) * 10 + (c3 % 10)
+        if primes.include?(r2) && primes.include?(r3) then
+          cnt += 1 if [r1, r2, r3, c1, c2, c3].uniq.size == 6
+        end
+      }
+    }
   }
 }
 puts cnt

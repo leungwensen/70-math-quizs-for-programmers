@@ -1,22 +1,22 @@
-M, N = 6, 5   # 设置“糖果包装纸”和“糖果本身”的数目
-@memo = {}    # 内存化所用的哈希表
+N = 11
+cards = [0] * N * 2      # 纸牌初始值
+@count = 0
 
-def search(candy, color)
-  return 1 if candy == [0] * N          # 所有糖果都包好了
-  # 如果存在内存化的结果，则使用
-  return @memo[candy + [color]] if @memo.has_key?(candy + [color])
-
-  # 统计包装纸和糖果口味不一致的组合
-  cnt = 0
-  candy.size.times{|i|
-    if i != (color % candy.size) then   # 不一致的情况
-      if candy[i] > 0 then              # 还剩下糖果的情况
-        candy[i] -= 1
-        cnt += search(candy, color + 1) # 进入下一层搜索
-        candy[i] += 1
+def search(cards, num)
+  if num == N + 1 then   # 放置到最后时处理成功
+    @count += 1
+  else
+    # 检查是否能放置，按顺序处理
+    (2 * N - 1 - num).times{|i|
+      if cards[i] == 0 && cards[i + num + 1] == 0 then
+        # 能放置的话就放置纸牌，递归搜索下一步
+        cards[i], cards[i + num + 1] = num, num
+        search(cards, num + 1)
+        cards[i], cards[i + num + 1] = 0, 0
       end
-    end
-  }
-  @memo[candy + [color]] = cnt   # 把糖果的数目和颜色保存起来
+    }
+  end
 end
-puts search([M] * N, 0)
+
+search(cards, 1)         # 最开始放置标记为“1”的纸牌
+puts @count

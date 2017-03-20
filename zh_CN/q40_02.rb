@@ -1,30 +1,19 @@
-N = 9
-@max = 0
-@max_list = Hash.new
+val = []
+256.times{|i|
+  # 反转0~255
+  rev = ('%08b'%i).reverse.to_i(2)
 
-def solve(cards, init, depth)
-  if cards[0] == 1 then
-    if @max < depth
-      @max = depth
-      @max_list.clear
-    end
-    @max_list[init] = cards if @max == depth
-  else
-    solve(cards[0..(cards[0] - 1)].reverse + cards[cards[0]..N],
-          init, depth + 1)
+  if i < rev then
+    s = i.to_s + rev.to_s
+    # 如果使用了0~9这10个数字个一次，就符合条件
+    val.push([i, rev]) if s.split('').uniq.size == s.length
   end
-end
+}
 
-def pattern(used, unused, index)
-  if unused.empty?
-    solve(used, used, 0)
-  else
-    unused.select{|i| index + 1 != i}.each{|i|
-      pattern(used + [i], unused - [i], index + 1)
-    }
-  end
-end
-
-pattern([], (1..N).to_a, 0)
-puts @max
-puts @max_list
+ip = []
+val.combination(2){|a, b|
+  # 使用了0~9这10个数字个一次，就形成分组
+  ip.push([a, b]) if (a + b).join.split('').uniq.size == 10
+}
+# 组合各分组输出结果
+puts ip.size * 8

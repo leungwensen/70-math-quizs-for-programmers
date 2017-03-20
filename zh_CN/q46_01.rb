@@ -1,22 +1,23 @@
-N = 7
-checked = {(1..N).to_a => 0} # 已检查的数组
-check = [(1..N).to_a]        # 检查目标
-depth = 0                    # 交换次数
+N = 4
+@count = Hash.new(0)
 
-while check.size > 0 do      # 如果存在检查目标，则循环
-  next_check = []
-  (0..(N-1)).to_a.combination(2){|i, j|  # 选择两个数字交换
-    check.each{|c|
-      d = c.clone
-      d[i], d[j] = d[j], d[i]
-      if !checked.has_key?(d) then
-        checked[d] = depth + 1
-        next_check << d
-      end
+def search()
+  # 把各行设置为数值
+  (0..(2**N-1)).to_a.repeated_permutation(N).each{|rows|
+    # 计算各列○的个数
+    col_count = Array.new(N, 0)
+    N.times{|c|
+      rows.each{|r|
+        col_count[c] += 1 if (r & (1 << c) > 0)
+      }
     }
+    # 计算各行○的个数
+    row_count = rows.map{|r| r.to_s(2).count("1")}
+    # 用哈希表记录行和列组合的出现次数
+    @count[row_count + col_count] += 1
   }
-  check = next_check
-  depth += 1
 end
 
-puts checked.values.inject(:+)
+search()
+# 输出只出现一次的组合
+puts @count.select{|k, v| v == 1}.count
